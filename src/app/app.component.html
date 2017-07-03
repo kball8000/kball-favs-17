@@ -22,5 +22,18 @@
 <!--<button (click)="decreaseNum()">Lower</button>
 <button (click)="increaseNum()">Higher</button>-->
 <button (click)="resetNum()">Reset</button>
-
+<button (click)="updateNum()">Update</button>
 <hr>
+<ul>
+  <li class="text" *ngFor='let item of items | async'>
+    {{item.favoriteColor}}
+    <!--{{item.$value}}-->
+  </li>
+</ul>
+
+
+<ul>
+  <li class="text" *ngFor='let item of myItems'>
+    {{item.favoriteColor}} - {{item.favoriteNumber}}
+  </li>
+</ul>
