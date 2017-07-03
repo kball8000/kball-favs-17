@@ -24,6 +24,10 @@
 <button (click)="resetNum()">Reset</button>
 <button (click)="updateNum()">Update</button>
 <hr>
+<button type="button" class="btn btn-default">
+  Bootstrap button
+  <!--<span class="glyphicon glyphicon-star" aria-hidden="true"></span> Star-->
+</button>
 <ul>
   <li class="text" *ngFor='let item of items | async'>
     {{item.favoriteColor}}
