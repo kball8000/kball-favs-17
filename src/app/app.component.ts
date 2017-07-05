@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AngularFireDatabase, FirebaseListObservable} from 'angularfire2/database';
 import * as firebase from 'firebase/app';
 
@@ -7,49 +7,48 @@ import * as firebase from 'firebase/app';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'Favorite Things - Getting Started';
-  favoriteColor = 'blue';
-  favoriteNumber = 0;
+  newDB = firebase.database();
+  newItemsRef = this.newDB.ref('/items');
+  newDBRef = this.newDB.ref();
+  favoriteColor = '';
+  favoriteNumber: number;
   items: FirebaseListObservable<any[]>;
   myItems: Array<any> = [];
 
-  constructor(db: AngularFireDatabase) {
-    this.items = db.list('/');
-    this.items.forEach(x => console.dir(x))
+  ngOnInit(): void {
+    // itemsRef.once('value', data => this.favoriteColor = data.val().favoriteColor);
+    this.newItemsRef.on('value', data => this.favoriteColor = data.val().favoriteColor);
+    this.newItemsRef.on('value', data => this.favoriteNumber = data.val().favoriteNumber);
 
-    this.items.forEach(x => {
-      this.myItems = x;
-    })
-    let database = firebase.database();
-    let itemsRef = database.ref('/');
-    itemsRef.on('value', function(el){
-      let obj = el.val();
-      for (let prop in obj){
-        console.log('prop: ', obj[prop]);
-      }
-    })
+    this.newItemsRef.on('value', (data) => {
+      console.log('d: ', data.val().favoriteNumber);
+    });
+  }
+  ngOnDestroy(): void {
+    this.newItemsRef.off()
+  }
+
+  constructor(db: AngularFireDatabase) {
+    // put things like console.log or functions here or ngOnInit, not top level.
   }
 
   dbRef = firebase.database().ref('/');
   itemsRef = firebase.database().ref('/items');
 
   setColor = function(selectedColor: string): void {
-    this.favoriteColor = selectedColor;
+    // this.newDBRef.child('items').update({favoriteColor: selectedColor})
+    this.newItemsRef.update({favoriteColor: selectedColor})
   };
   updateColor = function(): void {
     this.itemsRef.update({favoriteColor: this.favoriteColor});
-    // this.dbRef.on('value', data => console.dir(data));
   };
 
   setNum = (test): void => {
-    this.favoriteNumber = (test) ? ++this.favoriteNumber : --this.favoriteNumber;
+    (test) ? this.favoriteNumber++ : this.favoriteNumber--;
+    this.newItemsRef.update({favoriteNumber: this.favoriteNumber})
   }
-  updateNum = (): void => {
-    this.itemsRef.update({favoriteNumber: this.favoriteNumber});
-  };
 
-  increaseNum = () => this.favoriteNumber++;
-  decreaseNum = () => this.favoriteNumber--;
-  resetNum = () => this.favoriteNumber = 0;
+  resetNum = () => this.newItemsRef.update({favoriteNumber: 0})
 }
